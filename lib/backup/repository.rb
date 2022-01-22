@@ -23,11 +23,11 @@ module Backup
           FileUtils.mkdir_p(File.join(backup_repos_path, project.namespace.full_path)) if project.namespace
         end
 
-        if !empty_repo?(project)
+        if !empty_repo?(project) && !project.forked?
           backup_project(project)
           progress.puts "[DONE]".color(:green)
         else
-          progress.puts "[SKIPPED]".color(:cyan)
+          progress.puts "#{'[EMPTY]' if empty_repo?(project)} #{'[FORKED]' if project.forked?} [SKIPPED]".color(:cyan)
         end
 
         wiki = ProjectWiki.new(project)
