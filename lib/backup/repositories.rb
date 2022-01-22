@@ -253,6 +253,11 @@ module Backup
           return
         end
 
+        if repository.forked?
+          progress.puts " * #{display_repo_path} ... " + "[FORKED] [SKIPPED]".color(:cyan)
+          return
+        end
+
         FileUtils.mkdir_p(repository_backup_path)
 
         repository.bundle_to_disk(path_to_bundle)
