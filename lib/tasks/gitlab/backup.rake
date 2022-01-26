@@ -367,7 +367,8 @@ namespace :gitlab do
         max_storage_concurrency = ENV['GITLAB_BACKUP_MAX_STORAGE_CONCURRENCY'].presence
         Backup::GitalyBackup.new(progress, max_parallelism: max_concurrency, storage_parallelism: max_storage_concurrency)
       else
-        Backup::GitalyRpcBackup.new(progress)
+        skip_forked_repo = ENV.fetch('GITLAB_BACKUP_SKIP_FORKED_REPO', false)
+        Backup::GitalyRpcBackup.new(progress, skip_forked_repo)
       end
     end
   end

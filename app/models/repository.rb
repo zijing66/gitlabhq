@@ -75,6 +75,10 @@ class Repository
     @repo_type = repo_type
   end
 
+  def is_forked?
+    container.is_a?(Project) ? container.forked?: false
+  end
+
   def ==(other)
     other.is_a?(self.class) && @disk_path == other.disk_path
   end

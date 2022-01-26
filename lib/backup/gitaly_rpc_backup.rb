@@ -3,8 +3,9 @@
 module Backup
   # Backup and restores repositories using the gitaly RPC
   class GitalyRpcBackup
-    def initialize(progress)
+    def initialize(progress, skip_forked_repo = false)
       @progress = progress
+      @skip_forked_repo = skip_forked_repo
     end
 
     def start(type)
@@ -31,7 +32,8 @@ module Backup
       backup_restore = BackupRestore.new(
         progress,
         repository_type.repository_for(container),
-        backup_repos_path
+        backup_repos_path,
+        skip_forked_repo
       )
 
       case @type
@@ -50,19 +52,20 @@ module Backup
 
     private
 
-    attr_reader :progress
+    attr_reader :progress, :skip_forked_repo
 
     def backup_repos_path
       @backup_repos_path ||= File.join(Gitlab.config.backup.path, 'repositories')
     end
 
     class BackupRestore
-      attr_accessor :progress, :repository, :backup_repos_path
+      attr_accessor :progress, :repository, :backup_repos_path, :skip_forked_repo
 
-      def initialize(progress, repository, backup_repos_path)
+      def initialize(progress, repository, backup_repos_path, skip_forked_repo = false)
         @progress = progress
         @repository = repository
         @backup_repos_path = backup_repos_path
+        @skip_forked_repo = skip_forked_repo
       end
 
       def backup
@@ -70,6 +73,11 @@ module Backup
 
         if repository.empty?
           progress.puts " * #{display_repo_path} ... " + "[EMPTY] [SKIPPED]".color(:cyan)
+          return
+        end
+
+        if skip_forked_repo && repository.is_forked?
+          progress.puts " * #{display_repo_path} ... " + "[FORKED] [SKIPPED]".color(:cyan)
           return
         end
 

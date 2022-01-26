@@ -302,6 +302,25 @@ For installations from source:
 sudo -u git -H bundle exec rake gitlab:backup:create SKIP=db,uploads RAILS_ENV=production
 ```
 
+#### Skipping forked repositories
+
+If you do not want to create backup for forked repositories, you can set `GITLAB_BACKUP_SKIP_FORKED_REPO` 
+environment variable value to `true` 
+
+- `GITLAB_BACKUP_SKIP_FORKED_REPO`: Backup repositories without forked repositories (defaults to `false`).
+
+For Omnibus GitLab packages:
+
+```shell
+sudo gitlab-backup create GITLAB_BACKUP_SKIP_FORKED_REPO=true
+```
+
+For installations from source:
+
+```shell
+sudo -u git -H bundle exec rake gitlab:backup:create GITLAB_BACKUP_SKIP_FORKED_REPO=true RAILS_ENV=production
+```
+
 #### Skipping tar creation
 
 The last part of creating a backup is generation of a `.tar` file containing
